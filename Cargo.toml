@@ -1,0 +1,9 @@
+[package]
+name = "testfs_rust"
+version = "0.1.0"
+authors = ["Alexander Popiak <alexander.popiak@gmail.com>"]
+
+[dependencies]
+
+[lib]
+crate-type = ["staticlib"]
