@@ -1,10 +1,10 @@
 # testfs
->> a lofs clone for solaris written in Rust
+> a lofs clone for solaris written in Rust
 
 WIP
 
 ## Setup
->> Todo: describe prerequisites properly
+> Todo: describe prerequisites properly
 
 Prerequisites:
 rustup, cargo, xargo and cross with the right toolchains
