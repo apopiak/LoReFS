@@ -4,6 +4,12 @@ version = "0.1.0"
 authors = ["Alexander Popiak <alexander.popiak@gmail.com>"]
 
 [dependencies]
+libc = { version = "0.2", default-features = false }
+cstr_core = { version = "0.1.0", features = ["alloc"] }
+cty = "0.1"
 
 [lib]
 crate-type = ["staticlib"]
+
+[profile.release]
+panic = "abort"
