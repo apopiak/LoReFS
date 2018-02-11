@@ -1,6 +1,16 @@
 #![feature(lang_items, core_intrinsics, integer_atomics)]
 #![no_std]
+
 use core::sync::atomic::{AtomicU32, Ordering, ATOMIC_U32_INIT};
+
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+
+pub enum modlinkage {}
+
+extern "C" {
+    pub fn mod_install(module: *mut modlinkage) -> i32;
+    pub fn mod_remove(module: *mut modlinkage) -> i32;
+}
 
 static LORFS_MOUNT_COUNT: AtomicU32 = ATOMIC_U32_INIT;
 
@@ -22,6 +32,16 @@ pub extern fn lorfs_mount_count() -> u32 {
 #[no_mangle]
 pub extern fn lorfs_reset_mount_count() {
     LORFS_MOUNT_COUNT.store(0, Ordering::Release);
+}
+
+#[no_mangle]
+pub extern fn lorfs_mod_remove(module: *mut modlinkage) -> i32 {
+    unsafe { mod_remove(module) }
+}
+
+#[no_mangle]
+pub extern fn lorfs_print_notice() {
+    cmn_err(1, "a notice from rust");
 }
 
 // just a test to see if we can call into Rust; TODO: remove

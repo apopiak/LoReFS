@@ -1,0 +1,32 @@
+.MAKE_VERSION:	VERSION-1.0
+.BUILT_LAST_MAKE_RUN:
+md_basic.h:	meta_arr.x 
+	/usr/bin/rpcgen -C -M -D_KERNEL -DSYSV -h meta_basic.x  | \
+	awk '/<synch.h>/ { print "#ifdef _REENTRANT"; print $0; print "#endif\t/* _REENTRANT */"; next } \
+	/<thread.h>/ { print "#ifdef _REENTRANT"; print $0; print "#endif\t/* _REENTRANT */"; next } \
+		{ print  } \
+	' > md_basic.h
+.BUILT_LAST_MAKE_RUN:
+md_mdiox.h:
+	/usr/bin/rpcgen -C -M -D_KERNEL -DSYSV -h mdiox.x | \
+	awk '/<synch.h>/ { print "#ifdef _REENTRANT"; print $0; print "#endif\t/* _REENTRANT */"; next } \
+	/<thread.h>/ { print "#ifdef _REENTRANT"; print $0; print "#endif\t/* _REENTRANT */"; next } \
+		{ print  } \
+	' > md_mdiox.h
+.BUILT_LAST_MAKE_RUN:
+md_mhdx.h:
+	/usr/bin/rpcgen -C -M -D_KERNEL -DSYSV -h mhdx.x | \
+	awk '/<synch.h>/ { print "#ifdef _REENTRANT"; print $0; print "#endif\t/* _REENTRANT */"; next } \
+	/<thread.h>/ { print "#ifdef _REENTRANT"; print $0; print "#endif\t/* _REENTRANT */"; next } \
+		{ print  } \
+	' > md_mhdx.h
+.BUILT_LAST_MAKE_RUN:
+mdmed.h:
+	/usr/bin/rpcgen -C -M -D_KERNEL -DSYSV -h metamed.x | \
+	awk '/<synch.h>/ { print "#ifdef _REENTRANT"; print $0; print "#endif\t/* _REENTRANT */"; next } \
+	/<thread.h>/ { print "#ifdef _REENTRANT"; print $0; print "#endif\t/* _REENTRANT */"; next } \
+		{ print  } \
+	' > mdmed.h
+.BUILT_LAST_MAKE_RUN:
+mdmn_commd.h:
+	/usr/bin/rpcgen -h mdmn_commd.x > mdmn_commd.h

@@ -5,5 +5,8 @@ authors = ["Alexander Popiak <alexander.popiak@gmail.com>"]
 
 [dependencies]
 
+[build-dependencies]
+bindgen = "0.32.3"
+
 [lib]
 crate-type = ["staticlib"]
