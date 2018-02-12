@@ -1,5 +1,5 @@
-# testfs
-> a lofs clone for solaris written in Rust
+# LoReFS
+> loopback rust-extended file system: a lofs clone for solaris partly written in Rust
 
 WIP
 
