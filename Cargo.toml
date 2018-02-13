@@ -1,12 +1,13 @@
 [package]
-name = "testfs_rust"
+name = "lorefs"
 version = "0.1.0"
 authors = ["Alexander Popiak <alexander.popiak@gmail.com>"]
 
 [dependencies]
-libc = { version = "0.2", default-features = false }
-cstr_core = { version = "0.1.0", features = ["alloc"] }
+cstr_core = { version = "0.1.0" }
 cty = "0.1"
+libc = { version = "0.2", default-features = false }
+# compiler_builtins = { git = "https://github.com/rust-lang-nursery/compiler-builtins" }
 
 [lib]
 crate-type = ["staticlib"]

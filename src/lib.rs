@@ -9,7 +9,7 @@ extern crate libc;
 
 use alloc::allocator::{Alloc, Layout, AllocErr};
 use core::sync::atomic::{AtomicU32, Ordering, ATOMIC_U32_INIT};
-use cstr_core::{CStr, CString};
+use cstr_core::{CStr};
 use cty::{c_char, int32_t, uint32_t};
 
 // constants from kmem.h
@@ -68,49 +68,44 @@ extern "C" {
     pub fn mod_remove(module: *mut modlinkage) -> int32_t;
 }
 
-static LORFS_MOUNT_COUNT: AtomicU32 = ATOMIC_U32_INIT;
+static LOREFS_MOUNT_COUNT: AtomicU32 = ATOMIC_U32_INIT;
 
 #[no_mangle]
-pub extern fn lorfs_inc_mount_count() {
-    LORFS_MOUNT_COUNT.fetch_add(1, Ordering::AcqRel);
+pub extern fn lorefs_inc_mount_count() {
+    LOREFS_MOUNT_COUNT.fetch_add(1, Ordering::AcqRel);
 }
 
 #[no_mangle]
-pub extern fn lorfs_dec_mount_count() {
-    LORFS_MOUNT_COUNT.fetch_sub(1, Ordering::AcqRel);
+pub extern fn lorefs_dec_mount_count() {
+    LOREFS_MOUNT_COUNT.fetch_sub(1, Ordering::AcqRel);
 }
 
 #[no_mangle]
-pub extern fn lorfs_mount_count() -> uint32_t {
-    LORFS_MOUNT_COUNT.load(Ordering::Acquire)
+pub extern fn lorefs_mount_count() -> uint32_t {
+    LOREFS_MOUNT_COUNT.load(Ordering::Acquire)
 }
 
 #[no_mangle]
-pub extern fn lorfs_reset_mount_count() {
-    LORFS_MOUNT_COUNT.store(0, Ordering::Release);
+pub extern fn lorefs_reset_mount_count() {
+    LOREFS_MOUNT_COUNT.store(0, Ordering::Release);
 }
 
 #[no_mangle]
-pub extern fn lorfs_mod_remove(module: *mut modlinkage) -> int32_t {
+pub extern fn lorefs_mod_remove(module: *mut modlinkage) -> int32_t {
     unsafe { mod_remove(module) }
 }
 
 #[no_mangle]
-pub extern fn lorfs_print_notice() {
+pub extern fn lorefs_print_notice() {
     unsafe {
-        //let str = CStr::from_bytes_with_nul_unchecked(b"a notice from rust\0");
-        //cmn_err(cmn_err_flags::CE_NOTE, str.as_ptr());
-        let msg = CString::new("a message from rust");
-        match msg {
-            Ok(ref str) => cmn_err(cmn_err_flags::CE_NOTE, str.as_c_str().as_ptr()),
-            Err(_) => ()
-        }
+        let str = CStr::from_bytes_with_nul_unchecked(b"a notice from rust\0");
+        cmn_err(cmn_err_flags::CE_NOTE, str.as_ptr());
     }
 }
 
 // just a test to see if we can call into Rust; TODO: remove
 #[no_mangle]
-pub extern fn lorfs_add(a: int32_t, b: int32_t) -> int32_t {
+pub extern fn lorefs_add(a: int32_t, b: int32_t) -> int32_t {
     a + b
 }
 
