@@ -1,15 +1,17 @@
 #![feature(alloc, lang_items, core_intrinsics, integer_atomics)]
 #![feature(global_allocator, allocator_api, heap_api)]
+#![feature(compiler_builtins_lib)]
 #![no_std]
 
 extern crate alloc;
+extern crate compiler_builtins;
 extern crate cstr_core;
 extern crate cty;
 extern crate libc;
 
 use alloc::allocator::{Alloc, Layout, AllocErr};
 use core::sync::atomic::{AtomicU32, Ordering, ATOMIC_U32_INIT};
-use cstr_core::{CStr};
+use cstr_core::{CString};
 use cty::{c_char, int32_t, uint32_t};
 
 // constants from kmem.h
@@ -95,11 +97,15 @@ pub extern fn lorefs_mod_remove(module: *mut modlinkage) -> int32_t {
     unsafe { mod_remove(module) }
 }
 
+// just a test to see if we can call into Rust with allocations; TODO: remove
 #[no_mangle]
 pub extern fn lorefs_print_notice() {
     unsafe {
-        let str = CStr::from_bytes_with_nul_unchecked(b"a notice from rust\0");
-        cmn_err(cmn_err_flags::CE_NOTE, str.as_ptr());
+        let msg = CString::new("a message from rust");
+        match msg {
+            Ok(ref str) => cmn_err(cmn_err_flags::CE_NOTE, str.as_c_str().as_ptr()),
+            Err(_) => ()
+        }
     }
 }
 
@@ -107,6 +113,15 @@ pub extern fn lorefs_print_notice() {
 #[no_mangle]
 pub extern fn lorefs_add(a: int32_t, b: int32_t) -> int32_t {
     a + b
+}
+
+// use compiler intrinsics so they get compiled in -.-
+#[allow(unused)]
+fn dummy() {
+    #[allow(unused)]
+    let a = compiler_builtins::int::udiv::__udivti3(1, 2);
+    #[allow(unused)]
+    let b = compiler_builtins::int::udiv::__umodti3(3, 4);
 }
 
 // ----- language items that need to be defined -----
