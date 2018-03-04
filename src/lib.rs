@@ -12,21 +12,22 @@ extern crate libc;
 use alloc::allocator::{Alloc, Layout, AllocErr};
 use core::sync::atomic::{AtomicU32, Ordering, ATOMIC_U32_INIT};
 use cstr_core::{CString};
-use cty::{c_char, int32_t, uint32_t};
+use cty::*; //{c_char, int32_t, c_longlong, uint32_t, uint_t};
 
 // constants from kmem.h
 #[allow(unused)]
 mod kmem_flags {
-    pub const KM_SLEEP: ::libc::c_int     = 0x0000;    /* can block for memory; success guaranteed */
-    pub const KM_NOSLEEP: ::libc::c_int   = 0x0001;    /* cannot block for memory; may fail */
-    pub const KM_PANIC: ::libc::c_int     = 0x0002;    /* if memory cannot be allocated, panic */
-    pub const KM_PUSHPAGE: ::libc::c_int  = 0x0004;    /* can block for memory; may use reserve */
-    pub const KM_NORMALPRI: ::libc::c_int = 0x0008;    /* with KM_NOSLEEP, lower priority allocation */
-    pub const KM_VMFLAGS: ::libc::c_int   = 0x00ff;    /* flags that must match VM_* flags */
+    pub const KM_SLEEP: c_int     = 0x0000;    /* can block for memory; success guaranteed */
+    pub const KM_NOSLEEP: c_int   = 0x0001;    /* cannot block for memory; may fail */
+    pub const KM_PANIC: c_int     = 0x0002;    /* if memory cannot be allocated, panic */
+    pub const KM_PUSHPAGE: c_int  = 0x0004;    /* can block for memory; may use reserve */
+    pub const KM_NORMALPRI: c_int = 0x0008;    /* with KM_NOSLEEP, lower priority allocation */
+    pub const KM_VMFLAGS: c_int   = 0x00ff;    /* flags that must match VM_* flags */
 
-    pub const KM_FLAGS: ::libc::c_int     = 0xffff;    /* all settable kmem flags */
+    pub const KM_FLAGS: c_int     = 0xffff;    /* all settable kmem flags */
 }
 
+// <allocator>
 extern "C" {
     // kmem.h
     pub fn kmem_alloc(size: libc::size_t, kmflags: libc::c_int) -> *mut libc::c_void;
@@ -48,17 +49,18 @@ unsafe impl<'a> Alloc for &'a SolarisKernelAllocator {
 
 #[global_allocator]
 static GLOBAL: SolarisKernelAllocator = SolarisKernelAllocator;
+// </allocator>
 
 #[allow(non_camel_case_types)]
 pub enum modlinkage {}
 
 #[allow(unused)]
 mod cmn_err_flags {
-    pub const CE_CONT:      ::libc::c_int = 0;    /* continuation */
-    pub const CE_NOTE:      ::libc::c_int = 1;    /* notice */
-    pub const CE_WARN:      ::libc::c_int = 2;    /* warning */
-    pub const CE_PANIC:     ::libc::c_int = 3;    /* panic */
-    pub const CE_IGNORE:    ::libc::c_int = 4;    /* print nothing */
+    pub const CE_CONT:      c_int = 0;    /* continuation */
+    pub const CE_NOTE:      c_int = 1;    /* notice */
+    pub const CE_WARN:      c_int = 2;    /* warning */
+    pub const CE_PANIC:     c_int = 3;    /* panic */
+    pub const CE_IGNORE:    c_int = 4;    /* print nothing */
 }
 
 extern "C" {
@@ -68,8 +70,12 @@ extern "C" {
     // modctl.h
     pub fn mod_install(module: *mut modlinkage) -> int32_t;
     pub fn mod_remove(module: *mut modlinkage) -> int32_t;
+
+    // os/printf.h
+    pub fn printf(fmt: *const c_char, ...);
 }
 
+// mount count
 static LOREFS_MOUNT_COUNT: AtomicU32 = ATOMIC_U32_INIT;
 
 #[no_mangle]
@@ -92,6 +98,95 @@ pub extern fn lorefs_reset_mount_count() {
     LOREFS_MOUNT_COUNT.store(0, Ordering::Release);
 }
 
+// vnops
+/*
+  * vnode types.  VNON means no type.  These values are unrelated to
+  * values in on-disk inodes.
+  */
+#[repr(C)]
+#[allow(non_camel_case_types)]
+enum vtype {
+    VNON    = 0,
+    VREG    = 1,
+    VDIR    = 2,
+    VBLK    = 3,
+    VCHR    = 4,
+    VLNK    = 5,
+    VFIFO   = 6,
+    VDOOR   = 7,
+    VPROC   = 8,
+    VSOCK   = 9,
+    VPORT   = 10,
+    VBAD    = 11,
+}
+
+#[allow(non_camel_case_types)]
+enum vfs {}
+
+#[allow(non_camel_case_types)]
+enum stdata {}
+
+#[repr(C)]
+struct kmutex_t {
+    _opaque: *mut c_void,
+}
+
+type dev_t = ulong_t;
+
+#[repr(C)]
+struct vnode {
+    v_lock:    kmutex_t,       /* protects vnode fields */
+    v_flag:    uint_t,         /* vnode flags (see below) */
+    v_count:   uint_t,         /* reference count */
+    v_data:    *mut c_void,    /* private data for fs */
+    v_vfsp:    *mut vfs,       /* ptr to containing VFS */
+    v_stream:  *mut stdata,    /* associated stream */
+    v_type:    vtype,          /* vnode type */
+    v_rdev:    dev_t,          /* device (VCHR, VBLK) */
+
+     /* PRIVATE FIELDS BELOW
+        LEFT OUT BECAUSE THEY SHOULD NOT BE USED */
+}
+
+#[repr(C)]
+struct lnode {
+    lo_next: *mut lnode,    /* link for hash chain */
+    lo_vp: *mut vnode,      /* pointer to real vnode */
+    lo_looping: uint32_t,   /* looping flags */
+    lo_vnode: *mut vnode,   /* place holder vnode for file */
+}
+
+// return the the vnode pointer of the underlying fs
+#[inline]
+fn realvp(vp: *mut vnode) -> *mut vnode {
+    (vp.v_data as *mut lnode).lo_vp
+}
+
+#[allow(unused)]
+mod looping {
+    pub const LO_LOOPING:  c_int = 0x01;    /* Looping detected */
+    pub const LO_AUTOLOOP: c_int = 0x02;    /* Autonode looping detected */
+}
+
+type offset_t = c_longlong;
+
+#[no_mangle]
+pub extern fn lo_close(
+    vp:     *mut vnode,
+    flag:   c_int,
+    count:  c_int,
+    offset: offset_t,
+    cr:     *mut cred,
+    ct:     *mut caller_context_t)
+    -> c_int
+{
+    printf("lo_close vp %p realvp %p\n", vp, realvp(vp));
+
+    vp = realvp(vp);
+    return (VOP_CLOSE(vp, flag, count, offset, cr, ct));
+}
+
+// module
 #[no_mangle]
 pub extern fn lorefs_mod_remove(module: *mut modlinkage) -> int32_t {
     unsafe { mod_remove(module) }
