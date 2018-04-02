@@ -1,6 +1,10 @@
-#![feature(alloc, lang_items, core_intrinsics, integer_atomics)]
-#![feature(global_allocator, allocator_api, heap_api)]
+// we need to specify the 'eh_personality' and 'panic_fmt' language items
+#![feature(lang_items, core_intrinsics)]
+// we want to specify a custom Solaris kernel allocator
+#![feature(alloc, global_allocator, allocator_api, heap_api)]
 #![feature(compiler_builtins_lib)]
+#![feature(integer_atomics)]
+// we don't have access to a standard library in the kernel
 #![no_std]
 
 extern crate alloc;
@@ -100,9 +104,9 @@ pub extern fn lorefs_reset_mount_count() {
 
 // vnops
 /*
-  * vnode types.  VNON means no type.  These values are unrelated to
-  * values in on-disk inodes.
-  */
+ * vnode types.  VNON means no type.  These values are unrelated to
+ * values in on-disk inodes.
+ */
 #[repr(C)]
 #[allow(non_camel_case_types)]
 enum vtype {
@@ -156,7 +160,7 @@ struct lnode {
     lo_vnode: *mut vnode,   /* place holder vnode for file */
 }
 
-// return the the vnode pointer of the underlying fs
+// return the vnode pointer of the underlying fs
 #[inline]
 fn realvp(vp: *mut vnode) -> *mut vnode {
     (vp.v_data as *mut lnode).lo_vp
