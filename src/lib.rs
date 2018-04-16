@@ -15,12 +15,16 @@ extern crate libc;
 
 use alloc::allocator::{Alloc, Layout, AllocErr};
 use core::sync::atomic::{AtomicU32, Ordering, ATOMIC_U32_INIT};
-use cstr_core::{CString};
-use cty::*; //{c_char, int32_t, c_longlong, uint32_t, uint_t};
+use cstr_core::{CStr, CString};
+use libc::{c_char, c_int, c_long, c_longlong, c_void, int32_t, uint32_t};
+
+type uint_t = uint32_t;
+type ulong_t = c_long;
 
 // constants from kmem.h
 #[allow(unused)]
 mod kmem_flags {
+    use libc::c_int;
     pub const KM_SLEEP: c_int     = 0x0000;    /* can block for memory; success guaranteed */
     pub const KM_NOSLEEP: c_int   = 0x0001;    /* cannot block for memory; may fail */
     pub const KM_PANIC: c_int     = 0x0002;    /* if memory cannot be allocated, panic */
@@ -60,6 +64,7 @@ pub enum modlinkage {}
 
 #[allow(unused)]
 mod cmn_err_flags {
+    use libc::c_int;
     pub const CE_CONT:      c_int = 0;    /* continuation */
     pub const CE_NOTE:      c_int = 1;    /* notice */
     pub const CE_WARN:      c_int = 2;    /* warning */
@@ -109,7 +114,7 @@ pub extern fn lorefs_reset_mount_count() {
  */
 #[repr(C)]
 #[allow(non_camel_case_types)]
-enum vtype {
+pub enum vtype {
     VNON    = 0,
     VREG    = 1,
     VDIR    = 2,
@@ -125,28 +130,28 @@ enum vtype {
 }
 
 #[allow(non_camel_case_types)]
-enum vfs {}
+pub enum vfs {}
 
 #[allow(non_camel_case_types)]
-enum stdata {}
+pub enum stdata {}
 
 #[repr(C)]
-struct kmutex_t {
+pub struct kmutex_t {
     _opaque: *mut c_void,
 }
 
 type dev_t = ulong_t;
 
 #[repr(C)]
-struct vnode {
-    v_lock:    kmutex_t,       /* protects vnode fields */
-    v_flag:    uint_t,         /* vnode flags (see below) */
-    v_count:   uint_t,         /* reference count */
-    v_data:    *mut c_void,    /* private data for fs */
-    v_vfsp:    *mut vfs,       /* ptr to containing VFS */
-    v_stream:  *mut stdata,    /* associated stream */
-    v_type:    vtype,          /* vnode type */
-    v_rdev:    dev_t,          /* device (VCHR, VBLK) */
+pub struct vnode {
+    pub v_lock:    kmutex_t,       /* protects vnode fields */
+    pub v_flag:    uint_t,         /* vnode flags (see below) */
+    pub v_count:   uint_t,         /* reference count */
+    pub v_data:    *mut c_void,    /* private data for fs */
+    pub v_vfsp:    *mut vfs,       /* ptr to containing VFS */
+    pub v_stream:  *mut stdata,    /* associated stream */
+    pub v_type:    vtype,          /* vnode type */
+    pub v_rdev:    dev_t,          /* device (VCHR, VBLK) */
 
      /* PRIVATE FIELDS BELOW
         LEFT OUT BECAUSE THEY SHOULD NOT BE USED */
@@ -166,8 +171,28 @@ fn realvp(vp: *mut vnode) -> *mut vnode {
     (vp.v_data as *mut lnode).lo_vp
 }
 
+#[allow(non_camel_case_types)]
+pub enum caller_context_t {}
+
+#[allow(non_camel_case_types)]
+pub enum cred {}
+
+#[inline]
+fn vop_close(
+    vp: *mut vnode,
+    flag: c_int,
+    count: c_int,
+    offset: offset_t,
+    cr: *mut cred,
+    ct: *mut caller_context_t)
+    -> c_int
+{
+    return 0; //TODO implement
+}
+
 #[allow(unused)]
 mod looping {
+    use libc::c_int;
     pub const LO_LOOPING:  c_int = 0x01;    /* Looping detected */
     pub const LO_AUTOLOOP: c_int = 0x02;    /* Autonode looping detected */
 }
@@ -184,10 +209,10 @@ pub extern fn lo_close(
     ct:     *mut caller_context_t)
     -> c_int
 {
-    printf("lo_close vp %p realvp %p\n", vp, realvp(vp));
+    printf(CStr::from_bytes_with_nul_unchecked(b"lo_close vp %p realvp %p\n\0").as_ptr(), vp, realvp(vp));
 
     vp = realvp(vp);
-    return (VOP_CLOSE(vp, flag, count, offset, cr, ct));
+    return vop_close(vp, flag, count, offset, cr, ct);
 }
 
 // module
