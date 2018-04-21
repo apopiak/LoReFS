@@ -1,0 +1,81 @@
+# pristine memory
+Page Summary                Pages                MB  %Tot
+------------     ----------------  ----------------  ----
+Kernel                      85102               332    8%
+Anon                        19967                77    2%
+Exec and libs                1327                 5    0%
+Page cache                  20506                80    2%
+Free (cachelist)            20089                78    2%
+Free (freelist)            899407              3513   86%
+
+Total                     1046398              4087
+Physical                  1046397              4087
+
+
+# after modload
+Page Summary                Pages                MB  %Tot
+------------     ----------------  ----------------  ----
+Kernel                      85329               333    8%
+Anon                        20048                78    2%
+Exec and libs                1322                 5    0%
+Page cache                  20769                81    2%
+Free (cachelist)            19857                77    2%
+Free (freelist)            899073              3512   86%
+
+Total                     1046398              4087
+Physical                  1046397              4087
+
+
+# after mount
+Page Summary                Pages                MB  %Tot
+------------     ----------------  ----------------  ----
+Kernel                      85283               333    8%
+Anon                        20048                78    2%
+Exec and libs                1323                 5    0%
+Page cache                  20770                81    2%
+Free (cachelist)            19863                77    2%
+Free (freelist)            899111              3512   86%
+
+Total                     1046398              4087
+Physical                  1046397              4087
+
+
+# after umount
+Page Summary                Pages                MB  %Tot
+------------     ----------------  ----------------  ----
+Kernel                      85283               333    8%
+Anon                        20048                78    2%
+Exec and libs                1324                 5    0%
+Page cache                  20770                81    2%
+Free (cachelist)            19869                77    2%
+Free (freelist)            899104              3512   86%
+
+Total                     1046398              4087
+Physical                  1046397              4087
+
+# after modunload
+Page Summary                Pages                MB  %Tot
+------------     ----------------  ----------------  ----
+Kernel                      85177               332    8%
+Anon                        19972                78    2%
+Exec and libs                1339                 5    0%
+Page cache                  20922                81    2%
+Free (cachelist)            19706                76    2%
+Free (freelist)            899282              3512   86%
+
+Total                     1046398              4087
+Physical                  1046397              4087
+
+
+# and another one just to get a feel for the fluctuation
+Page Summary                Pages                MB  %Tot
+------------     ----------------  ----------------  ----
+Kernel                      85178               332    8%
+Anon                        19972                78    2%
+Exec and libs                1325                 5    0%
+Page cache                  20772                81    2%
+Free (cachelist)            19870                77    2%
+Free (freelist)            899281              3512   86%
+
+Total                     1046398              4087
+Physical                  1046397              4087
