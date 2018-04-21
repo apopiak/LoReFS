@@ -1,3 +1,4 @@
+#!/bin/bash
 set -ex
 
 docker run --userns host --rm --user 1000:1000 \
