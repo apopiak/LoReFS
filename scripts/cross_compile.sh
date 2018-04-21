@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+# run japaric's cross compiling container directly, because `cross` is lacking
+# mac support
 docker run --userns host --rm --user 1000:1000 \
     -e CARGO_HOME=/cargo -e CARGO_TARGET_DIR=/target -e USER=$USER -e XARGO_HOME=/xargo \
     -v $HOME/.xargo:/xargo \
