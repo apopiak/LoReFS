@@ -4,7 +4,7 @@ extern void lorefs_subrfini(void);
 
 // declarations for symbols defined in Rust
 // vnode ops functions
-int lo_close(vnode_t *vp, int flag, int count, offset_t offset, cred *cr, caller_context_t *ct);
+extern int lo_close(vnode_t *vp, int flag, int count, offset_t offset, struct cred *cr, caller_context_t *ct);
 
 // atomic mount counter functions
 void lorefs_inc_mount_count();
