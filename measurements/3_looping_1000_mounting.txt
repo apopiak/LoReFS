@@ -1,0 +1,26 @@
+# before
+Page Summary                Pages                MB  %Tot
+------------     ----------------  ----------------  ----
+Kernel                      84247               329    8%
+Anon                        20194                78    2%
+Exec and libs                1524                 5    0%
+Page cache                  18964                74    2%
+Free (cachelist)            15325                59    1%
+Free (freelist)            906144              3539   87%
+
+Total                     1046398              4087
+Physical                  1046397              4087
+
+
+# after
+Page Summary                Pages                MB  %Tot
+------------     ----------------  ----------------  ----
+Kernel                      84261               329    8%
+Anon                        20196                78    2%
+Exec and libs                1327                 5    0%
+Page cache                  19111                74    2%
+Free (cachelist)            15523                60    1%
+Free (freelist)            905980              3538   87%
+
+Total                     1046398              4087
+Physical                  1046397              4087

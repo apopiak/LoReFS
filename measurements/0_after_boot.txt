@@ -1,0 +1,12 @@
+# after boot, before doing anything
+Page Summary                Pages                MB  %Tot
+------------     ----------------  ----------------  ----
+Kernel                      84270               329    8%
+Anon                        20085                78    2%
+Exec and libs                1305                 5    0%
+Page cache                  18718                73    2%
+Free (cachelist)            15194                59    1%
+Free (freelist)            906826              3542   87%
+
+Total                     1046398              4087
+Physical                  1046397              4087
