@@ -127,11 +127,6 @@ _init(void)
 	return (status);
 }
 
-/*
- * Don't allow the lorefs module to be unloaded for now.
- * There is a memory leak if it gets unloaded.
- */
-
 static int lorefsfstype;
 
 int
@@ -149,11 +144,8 @@ _fini(void)
 		return (error);
 	}
 
+	(void) vfs_freevfsops_by_type(lorefsfstype);
 	vn_freevnodeops(lo_vnodeops);	
-	error = vfs_freevfsops_by_type(lorefsfstype);
-	if (error != 0) {
-		cmn_err(CE_WARN, "lorefs freevfsops failed with code: %d", error);
-	}	
 	lorefs_subrfini();	
 	return (0);
 }
@@ -582,6 +574,8 @@ lo_freevfs(struct vfs *vfsp)
 	kmem_free(li, sizeof (struct loinfo));
 }
 
+extern const int nfstype;
+
 static int
 lorefsinit(int fstyp, char *name)
 {
@@ -596,6 +590,7 @@ lorefsinit(int fstyp, char *name)
 		NULL,			NULL
 	};
 	cmn_err(CE_NOTE, "lorefsinit: fstype: %d", fstyp);
+	cmn_err(CE_NOTE, "nfstype: %d", nfstype);
 
 	int error;
 

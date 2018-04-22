@@ -41,6 +41,8 @@
 #include <vm/as.h>
 #include <vm/seg.h>
 
+#include "lorefs_rust.h"
+
 /*
  * These are the vnode ops routines which implement the vnode interface to
  * the looped-back file system.  These routines just take their parameters,
@@ -98,22 +100,6 @@ lo_open(vnode_t **vpp, int flag, struct cred *cr, caller_context_t *ct)
 	}
 
 	return (error);
-}
-
-static int
-lo_close(
-	vnode_t *vp,
-	int flag,
-	int count,
-	offset_t offset,
-	struct cred *cr,
-	caller_context_t *ct)
-{
-#ifdef LODEBUG
-	lo_dprint(4, "lo_close vp %p realvp %p\n", vp, realvp(vp));
-#endif
-	vp = realvp(vp);
-	return (VOP_CLOSE(vp, flag, count, offset, cr, ct));
 }
 
 static int
