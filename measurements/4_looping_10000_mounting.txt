@@ -13,3 +13,14 @@ Physical                  1046397              4087
 
 
 # after
+Page Summary                Pages                MB  %Tot
+------------     ----------------  ----------------  ----
+Kernel                      86357               337    8%
+Anon                        20273                79    2%
+Exec and libs                1313                 5    0%
+Page cache                  66099               258    6%
+Free (cachelist)            17472                68    2%
+Free (freelist)            854884              3339   82%
+
+Total                     1046398              4087
+Physical                  1046397              4087
