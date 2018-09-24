@@ -132,12 +132,14 @@ static int lorefsfstype;
 int
 _fini(void)
 {
-	uint32_t count = lorefs_mount_count();	
+#ifdef LODEBUG
+	uint32_t count = lorefs_mount_count();
 	cmn_err(CE_NOTE, "lorefs_mount_count: %d", count);
+#endif
 	// only allow unloading when no mounts exist
 	if (lorefs_mount_count())
 		return (EBUSY);
-	
+
 	int error = lorefs_mod_remove(&modlinkage);
 	if (error != 0) {
 		cmn_err(CE_WARN, "lorefs mod remove failed with code: %d", error);
@@ -145,8 +147,8 @@ _fini(void)
 	}
 
 	(void) vfs_freevfsops_by_type(lorefsfstype);
-	vn_freevnodeops(lo_vnodeops);	
-	lorefs_subrfini();	
+	vn_freevnodeops(lo_vnodeops);
+	lorefs_subrfini();
 	return (0);
 }
 
@@ -182,7 +184,7 @@ lo_mount(struct vfs *vfsp,
 		return (EPERM);
 
 	int num = lorefs_add(6, 4);
-	cmn_err(CE_NOTE, "number from rust: %d", num);	
+	cmn_err(CE_NOTE, "number from rust: %d", num);
 	lorefs_print_notice();
 	/*
 	 * Loopback devices which get "nodevices" added can be done without
